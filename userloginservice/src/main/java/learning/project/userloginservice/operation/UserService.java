@@ -3,10 +3,13 @@ package learning.project.userloginservice.operation;
 import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import learning.project.userloginservice.dto.UserInfoDto;
 import learning.project.userloginservice.model.User;
 import learning.project.userloginservice.repository.UserRepository;
@@ -40,16 +43,20 @@ public class UserService {
         return "User created successfully";
     }
 
-    public String login(UserInfoDto userInfoDto) throws Exception{
+    public ResponseEntity<?> login(UserInfoDto userInfoDto, HttpServletResponse response) throws Exception{
         User user = userRepository.findByUsername(userInfoDto.getUsername());
         if(ObjectUtils.isEmpty(user)){
             throw new Exception("User not found please create a account");
         }
         passwordValidation(userInfoDto.getPassword(),user.getPassword());
-        return jwtService.generateToken(userInfoDto.getUsername());
+        generateTokenAddItToResponse(jwtService.generateToken(userInfoDto.getUsername()),response);
+        return ResponseEntity.ok(userInfoDto);
         // return "User logged in successfully";
     }
-
+    public static void generateTokenAddItToResponse(String generatedToken, HttpServletResponse response){
+        Cookie cookie = new Cookie("JWT_TOKEN", generatedToken);
+        response.addCookie(cookie);
+    }
     public void passwordValidation(String payloadPassword,String dbPassword) throws Exception{
         if(!passwordEncoder.matches(payloadPassword, dbPassword)){
             throw new Exception("Wrong Password");
