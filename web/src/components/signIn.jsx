@@ -2,7 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 
 const baseurl = axios.create({
-  baseURL: "http://localhost:8080/api/v1/user",
+  baseURL: `${process.env.REACT_APP_API_BASE}${process.env.REACT_APP_API_PREFIX}`,
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",

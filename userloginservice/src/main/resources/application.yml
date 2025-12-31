@@ -1,35 +1,31 @@
+server:
+  port: ${PORT:8080}
+
 spring:
   application:
     name: userloginservice
   datasource:
-    url: jdbc:oracle:thin:@localhost:1521/XEPDB1
-    username: userlogin
-    password: userlogin
+    url: ${DB_URL:jdbc:oracle:thin:@localhost:1521/XEPDB1}
+    username: ${DB_USERNAME:userlogin}
+    password: ${DB_PASSWORD:userlogin}
     driver-class-name: oracle.jdbc.OracleDriver
     hikari:
       maximum-pool-size: 10
       minimum-idle: 2
       connection-timeout: 30000
       idle-timeout: 600000
-  security:
-    user:
-      name: lohith
-      password: pass
 
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:none}
     show-sql: false
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.OracleDialect
+        dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
         jdbc:
           lob:
             non_contextual_creation: true
-
-server:
-  port: 8080
 
 logging:
   level:
@@ -39,5 +35,5 @@ logging:
 
 app:
   jwt:
-    secret: 5367566859703373367639792F423F452848284D6251655468576D5A71347437
+    secret: ${JWT_SECRET:5367566859703373367639792F423F452848284D6251655468576D5A71347437}
     expiration-minutes: 30
