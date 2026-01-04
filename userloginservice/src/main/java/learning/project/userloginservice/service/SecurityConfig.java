@@ -47,8 +47,7 @@ public class SecurityConfig {
         
         cors.setAllowedOrigins(Arrays.asList(
             "http://localhost:3000",
-            "http://127.0.0.1:3000",
-            "https://*.railway.app"
+            "http://127.0.0.1:3000"
         ));
         cors.setAllowedMethods(Arrays.asList("POST", "GET", "PUT", "DELETE", "OPTIONS"));
         cors.setAllowCredentials(true);

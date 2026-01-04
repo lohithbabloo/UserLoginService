@@ -20,15 +20,14 @@ import learning.project.userloginservice.dto.UserInfoDto;
 @Component
 public class JwtService {
 
-    @Value("${app.jwt.secret}") 
+    @Value("${app.jwt.secret}")
     private String secret;
-    
+
     @Value("${app.jwt.expiration-minutes}")
     private long expirationMinutes;
 
-
-    public String generateToken(String userName) {
-        return generateToken(Map.of(), userName);
+    public String generateToken(String userName, String tokenType) {
+        return generateToken(Map.of("type", tokenType), userName);
     }
 
     public String generateToken(Map<String, Object> extraClaims, String userName) {
@@ -70,7 +69,7 @@ public class JwtService {
                 .getBody();
     }
 
-    private boolean isTokenExpired(String token) {
+    public boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
 
@@ -79,5 +78,3 @@ public class JwtService {
         return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
 }
-    
-

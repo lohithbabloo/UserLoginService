@@ -8,10 +8,12 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 @Entity
-@Data
+@Getter
 @Table(name = "USER_DATA")
+@NoArgsConstructor
 public class User {
 
     @Id
@@ -35,5 +37,15 @@ public class User {
 
     @Column(name = "USER_STATUS")
     private String userStatus;
+
+    public User(String username,String email,String password,String userStatus){
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.userStatus = userStatus;
+        this.createdAt = LocalDateTime.now();
+        this.updatedAt = LocalDateTime.now();
+
+    }
 
 }
