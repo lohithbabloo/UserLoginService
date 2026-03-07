@@ -38,7 +38,7 @@ public class User {
     @Column(name = "USER_STATUS")
     private String userStatus;
 
-    public User(String username,String email,String password,String userStatus){
+    public User(String username,String password,String email,String userStatus){
         this.username = username;
         this.password = password;
         this.email = email;

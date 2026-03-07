@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router";
 import axios from "axios";
 
 const baseurl = axios.create({
@@ -14,43 +13,25 @@ const baseurl = axios.create({
   },
 });
 function SignIn() {
-  const navigate = useNavigate();
   const [userName, setUserName] = useState("");
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [rePassword, setRePassword] = useState("");
-  const handlePasswordCheck = (e) => {
-    if (password === "" || rePassword === "") {
-      alert("Please fill in all fields");
-      return;
-    }
-    if (password !== rePassword) {
-      alert("Passwords do not match");
-      return;
-    }
-  };
 
   const handleSignIn = async (e) => {
-    handlePasswordCheck();
     const payload = {
       username: userName,
       password: password,
-      email: email,
     };
     try {
-      const response = await baseurl.post("/signup", payload);
+      const response = await baseurl.post("/login", payload);
       console.log(baseurl);
       console.log(response);
       setUserName("");
-      setEmail("");
-      setRePassword("");
       setPassword("");
       if (response.status === 200) {
-        alert("Signup successful! Please log in.");
-        navigate("/login");
+        alert("Login successful!");
       }
     } catch (e) {
-      alert("signup failed man!!!!");
+      alert("login failed man!!!!");
     }
   };
   return (
@@ -63,27 +44,13 @@ function SignIn() {
         required
       ></input>
       <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        required
-      ></input>
-      <input
         type="password"
         placeholder="Password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         required
       ></input>
-      <input
-        type="password"
-        placeholder="Re-Confirm Password"
-        value={rePassword}
-        onChange={(e) => setRePassword(e.target.value)}
-        required
-      ></input>
-      <button onClick={handleSignIn}>Sign In</button>
+      <button onClick={handleSignIn}>Log In</button>
     </div>
   );
 }

@@ -18,7 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 @RestController
-@RequestMapping("/api/v1/user")
+@RequestMapping("/auth/api/v1")
 public class UserController {
 
     @Autowired
