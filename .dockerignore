@@ -1,0 +1,28 @@
+userloginservice/target/
+userloginservice/.classpath
+userloginservice/.project
+userloginservice/.settings/
+userloginservice/*.log
+
+web/node_modules/
+web/build/
+web/.env.local
+web/.env.development.local
+web/.env.test.local
+web/.env.production.local
+web/npm-debug.log*
+web/yarn-debug.log*
+web/yarn-error.log*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+.dockerignore
