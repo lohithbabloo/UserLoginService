@@ -4,6 +4,7 @@ import java.security.Key;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -26,8 +27,8 @@ public class JwtService {
     @Value("${app.jwt.expiration-minutes}")
     private long expirationMinutes;
 
-    public String generateToken(String userName, String tokenType) {
-        return generateToken(Map.of("type", tokenType), userName);
+    public String generateToken(String userName, Map<String,Object> extraClaims) {
+        return generateToken(extraClaims, userName);
     }
 
     public String generateToken(Map<String, Object> extraClaims, String userName) {
@@ -50,6 +51,10 @@ public class JwtService {
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
+    }
+
+    public List<String> extractRole(String token) {
+        return extractClaim(token, claims -> claims.get("role", List.class));
     }
 
     public Date extractExpiration(String token) {
@@ -77,4 +82,5 @@ public class JwtService {
         String username = extractUsername(token);
         return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
+
 }

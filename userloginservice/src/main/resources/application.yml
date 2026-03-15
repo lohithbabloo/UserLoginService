@@ -5,10 +5,10 @@ spring:
   application:
     name: userloginservice
   datasource:
-    url: ${DB_URL:jdbc:oracle:thin:@localhost:1521/XEPDB1}
-    username: ${DB_USERNAME:userlogin}
-    password: ${DB_PASSWORD:userlogin}
-    driver-class-name: oracle.jdbc.OracleDriver
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/userloginservice}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:db1234}
+    driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 10
       minimum-idle: 2
@@ -17,11 +17,11 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:none}
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
     show-sql: false
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.OracleDialect
+        # dialect: org.hibernate.dialect.OracleDialect
         format_sql: true
         jdbc:
           lob:
