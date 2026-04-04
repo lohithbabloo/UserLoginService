@@ -1,18 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import axios from "axios";
-
-const baseurl = axios.create({
-  baseURL: "http://localhost:8080/auth/api/v1",
-  withCredentials: true,
-  headers: {
-    "Content-Type": "application/json",
-    "X-XSRF-TOKEN": document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("XSRF-TOKEN="))
-      ?.split("=")[1],
-  },
-});
+import baseurl from "../commonComponents/apiClient";
 function SignUp() {
   const navigate = useNavigate();
   const [userName, setUserName] = useState("");
@@ -55,7 +43,7 @@ function SignUp() {
       email: email,
     };
     try {
-      const response = await baseurl.post("/signup", payload);
+      const response = await baseurl.post("/auth/api/v1/signup", payload);
       if (response.status === 200) {
         setSuccess("Signup successful! Redirecting to login...");
         setUserName("");

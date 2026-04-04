@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router";
 
-function BasePage() {
+function WelcomePage() {
   const navigate = useNavigate();
   function navigatePath(path) {
     navigate(path);
@@ -42,4 +42,4 @@ function BasePage() {
   );
 }
 
-export default BasePage;
+export default WelcomePage;

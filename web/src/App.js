@@ -1,8 +1,9 @@
-import SignUp from "./components/signIn";
-import Login from "./components/login";
-import BasePage from "./components/basePage";
+import Login from "./components/Login";
+import WelcomePage from "./components/WelcomePage";
+import Forbidden from "./components/Forbidden";
 import { BrowserRouter, Routes, Route } from "react-router";
 import "./index.css";
+import SignUp from "./components/signIn";
 function App() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
@@ -10,7 +11,8 @@ function App() {
         <Routes>
           <Route path="/signup" element={<SignUp />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/" element={<BasePage />} />
+          <Route path="/" element={<WelcomePage />} />
+          <Route path="/forbidden" element={<Forbidden />} />
         </Routes>
       </BrowserRouter>
     </div>
