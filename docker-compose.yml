@@ -12,6 +12,7 @@ services:
       - "1522:1521" # Changed host port to 1522 to avoid conflict
     volumes:
       - oracle-data:/opt/oracle/oradata
+      - ./oracle-init.sql:/docker-entrypoint-initdb.d/01-init.sql
     networks:
       - userlogin-network
 

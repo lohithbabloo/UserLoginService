@@ -1,4 +1,4 @@
-package learning.project.userloginservice.service;
+package learning.project.userloginservice.config;
 
 import java.util.Arrays;
 
@@ -21,6 +21,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import learning.project.userloginservice.service.JwtAuthCustomFilter;
+
 
 @Configuration
 @EnableWebSecurity
@@ -35,8 +37,7 @@ public class SecurityConfig {
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 .ignoringRequestMatchers("/auth/api/v1/login","/auth/api/v1/signup")
             )
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/v1/**").permitAll()     
+            .authorizeHttpRequests(auth -> auth    
                 .requestMatchers("/auth/**").permitAll()      
                 .requestMatchers("/actuator/**").permitAll() 
                 .anyRequest().authenticated()

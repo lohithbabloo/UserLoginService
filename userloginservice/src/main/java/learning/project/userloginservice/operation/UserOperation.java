@@ -127,4 +127,10 @@ public class UserOperation {
                 "RETRY_TOKEN", 24 * 60 * 60);
         return new ResponseEntity<>("Logged out", HttpStatus.OK);
     }
+
+
+    public List<UserInfoDto> getUserData(){
+        List<UserInfoDto> usersData = userRepository.getAllUserData("Active");
+        return usersData;
+    }
 }

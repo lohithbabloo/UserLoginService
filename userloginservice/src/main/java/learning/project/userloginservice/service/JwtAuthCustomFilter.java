@@ -14,7 +14,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import learning.project.userloginservice.util.CookieUtil;
@@ -30,7 +29,11 @@ public class JwtAuthCustomFilter extends OncePerRequestFilter{
         if(Objects.nonNull(cookie) && !jwtService.isTokenExpired(cookie)) {
             String username = jwtService.extractUsername(cookie);
             List<String> roles = jwtService.extractRole(cookie);
-            UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(username, null, roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()));
+            System.out.println(roles);
+            System.out.println("it came here");
+            UsernamePasswordAuthenticationToken authToken = 
+            new UsernamePasswordAuthenticationToken(username, null, roles.stream().map(SimpleGrantedAuthority::new)
+            .collect(Collectors.toList()));
             SecurityContextHolder.getContext().setAuthentication(authToken);
         }
         filterChain.doFilter(request, response);
