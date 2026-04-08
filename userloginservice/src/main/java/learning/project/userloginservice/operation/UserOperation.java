@@ -1,10 +1,8 @@
 package learning.project.userloginservice.operation;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -132,5 +130,9 @@ public class UserOperation {
     public List<UserInfoDto> getUserData(){
         List<UserInfoDto> usersData = userRepository.getAllUserData("Active");
         return usersData;
+    }
+
+    public UserInfoDto getUserDataBasedOnUserName(String userName){
+        return userRepository.getUserData(userName, "Active");
     }
 }

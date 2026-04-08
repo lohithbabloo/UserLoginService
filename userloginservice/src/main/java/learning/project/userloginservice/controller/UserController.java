@@ -9,6 +9,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import learning.project.userloginservice.dto.UserInfoDto;
@@ -27,5 +28,11 @@ public class UserController {
     @PreAuthorize("hasRole('ROLE_Admin')")
     public ResponseEntity<List<UserInfoDto>> getAllUsersData(){
         return new ResponseEntity<>(userOperation.getUserData(),HttpStatus.OK);
+    }
+
+    @GetMapping("/mydata")
+    @PreAuthorize("hasRole('ROLE_User')")
+    public ResponseEntity<UserInfoDto> getUserData(@RequestParam String userName){
+        return new ResponseEntity<>(userOperation.getUserDataBasedOnUserName(userName),HttpStatus.OK);
     }
 }

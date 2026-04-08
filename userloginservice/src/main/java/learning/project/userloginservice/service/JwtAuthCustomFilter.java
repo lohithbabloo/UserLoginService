@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -20,8 +20,13 @@ import learning.project.userloginservice.util.CookieUtil;
 
 @Component
 public class JwtAuthCustomFilter extends OncePerRequestFilter{
-    @Autowired
-    private JwtService jwtService;
+    private final JwtService jwtService;
+    private final GrantedAuthoritiesMapper authoritiesMapper;
+
+    public JwtAuthCustomFilter(JwtService jwtService, GrantedAuthoritiesMapper authoritiesMapper) {
+        this.jwtService = jwtService;
+        this.authoritiesMapper = authoritiesMapper;
+    }
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
@@ -29,14 +34,15 @@ public class JwtAuthCustomFilter extends OncePerRequestFilter{
         if(Objects.nonNull(cookie) && !jwtService.isTokenExpired(cookie)) {
             String username = jwtService.extractUsername(cookie);
             List<String> roles = jwtService.extractRole(cookie);
-            System.out.println(roles);
-            System.out.println("it came here");
+            var authorities = roles.stream().map(x-> new SimpleGrantedAuthority("ROLE_"+x))
+                .collect(Collectors.toList());
+            var mappedAuthorities = authoritiesMapper.mapAuthorities(authorities);
             UsernamePasswordAuthenticationToken authToken = 
-            new UsernamePasswordAuthenticationToken(username, null, roles.stream().map(SimpleGrantedAuthority::new)
-            .collect(Collectors.toList()));
+            new UsernamePasswordAuthenticationToken(username, null, mappedAuthorities);
             SecurityContextHolder.getContext().setAuthentication(authToken);
         }
         filterChain.doFilter(request, response);
+        
     }
     
 }

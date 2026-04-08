@@ -12,12 +12,12 @@ const baseurl = axios.create({
   },
 });
 
-// Error interceptor to handle 403 responses
 baseurl.interceptors.response.use(
   (response) => response,
+  console.log("intercepted error:"),
   (error) => {
+    console.log("intercepted error:", error.response);
     if (error.response?.status === 403) {
-      // Redirect to forbidden page
       window.location.href = "/forbidden";
     }
     return Promise.reject(error);
