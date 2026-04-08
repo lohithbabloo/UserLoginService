@@ -10,6 +10,7 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
 import learning.project.userloginservice.model.Role;
@@ -32,12 +33,15 @@ public class Dataintializer implements ApplicationRunner {
     private UserHasRoleRepository userHasRoleRepository;
 
     @Override
+    @Transactional
     public void run(ApplicationArguments args) throws Exception {
         System.out.println("Data intializer is running");
         // check if roles are present in the db else create
         List<String> roleNames = roleRepository.findRoleNames();
+        System.out.println(roleNames);
         List<Role> rolesToBeSaved = new ArrayList<>();
         List<String> missingRolesInDb = Constants.ROLES_IN_APPLICATION.stream().filter(y->!roleNames.contains(y)).collect(Collectors.toList());
+        System.out.println(missingRolesInDb);
         if(!ObjectUtils.isEmpty(missingRolesInDb)){
             for(String roleName: missingRolesInDb){
                 // Create the role

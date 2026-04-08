@@ -1,5 +1,6 @@
 package learning.project.userloginservice.operation;
 
+import java.net.http.HttpRequest;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -7,6 +8,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -16,12 +18,13 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import learning.project.userloginservice.dto.UserInfoDto;
-import learning.project.userloginservice.globalException.AuthenticationException;
 import learning.project.userloginservice.model.Role;
 import learning.project.userloginservice.model.User;
 import learning.project.userloginservice.model.UserHasRole;
+import learning.project.userloginservice.model.UserLoginHistory;
 import learning.project.userloginservice.repository.RoleRepository;
 import learning.project.userloginservice.repository.UserHasRoleRepository;
+import learning.project.userloginservice.repository.UserLoginHistoryRepository;
 import learning.project.userloginservice.repository.UserRepository;
 import learning.project.userloginservice.service.JwtService;
 import learning.project.userloginservice.util.Constants;
@@ -39,6 +42,9 @@ public class UserOperation {
     private UserHasRoleRepository userHasRoleRepository;
 
     @Autowired
+    private UserLoginHistoryRepository userLoginHistoryRepository;
+
+    @Autowired
     private RoleRepository roleRepository;
 
     private PasswordEncoder passwordEncoder;
@@ -47,7 +53,7 @@ public class UserOperation {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public String createUser(UserInfoDto userInfoDto) {
+    public ResponseEntity<?> createUser(UserInfoDto userInfoDto) {
         User user = new User(userInfoDto.getUsername(), passwordEncoder.encode(userInfoDto.getPassword()),
                 userInfoDto.getEmail(), "Active");
         Role userRole = roleRepository.findByRoleName(Constants.USER);
@@ -58,15 +64,17 @@ public class UserOperation {
         userHasRole.setStatus(Constants.STATUS_ACTIVE);
         userHasRoleRepository.save(userHasRole);
         userRepository.save(user);
-        return "User created successfully";
+        return ResponseEntity.ok(Map.of("message","User Created Successfully"));
     }
 
-    public ResponseEntity<?> login(UserInfoDto userInfoDto, HttpServletResponse response) throws Exception {
-        List<UserHasRole> user = userHasRoleRepository.findByUserName(userInfoDto.getUsername());
+    public ResponseEntity<?> login(UserInfoDto userInfoDto, HttpServletResponse response, HttpServletRequest request) throws Exception {
+        try{
+            List<UserHasRole> user = userHasRoleRepository.findByUserName(userInfoDto.getUsername());
         List<String> roles = user.stream().map(u -> u.getRole().getRoleName()).collect(Collectors.toList());
         if (ObjectUtils.isEmpty(user)) {
             // throw new AuthenticationException("User not found please create a account");
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            logUserLoginMetaData(request, userInfoDto.getUsername(), "Failure");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message","Invalid Credentials"));
         }
         passwordValidation(userInfoDto.getPassword(), user.get(0).getUser().getPassword());
         
@@ -75,7 +83,28 @@ public class UserOperation {
         
         generateTokenAddItToResponse(jwtService.generateToken(userInfoDto.getUsername(), generateExtraClaims("RETRY_TOKEN", roles)), response,
                 "RETRY_TOKEN", 24 * 60 * 60);
+        logUserLoginMetaData(request, userInfoDto.getUsername(), "Success");
         return ResponseEntity.ok(Map.of("message", "Logged In"));
+        } catch(Exception e){
+            logUserLoginMetaData(request, userInfoDto.getUsername(), "Failure");
+            return ResponseEntity.ok(Map.of("message", "Invalid Credentials"));
+        }
+    }
+
+
+    private void logUserLoginMetaData(HttpServletRequest request, String userName,String loginStatus) {
+        String ip = request.getHeader( "X-Forwarded-For");
+        if (ObjectUtils.isEmpty(ip)) {
+            ip = request.getRemoteAddr();
+        }
+        String userAgent = request.getHeader("User-Agent");
+        UserLoginHistory userLoginHistory = new UserLoginHistory();
+        userLoginHistory.setUserId(userName);
+        userLoginHistory.setIpAddress(ip);
+        userLoginHistory.setLoginTime(LocalDateTime.now()); 
+        userLoginHistory.setLoginStatus(loginStatus);
+        userLoginHistory.setUserDevice(userAgent);
+        userLoginHistoryRepository.save(userLoginHistory);
     }
     private Map<String,Object> generateExtraClaims(String tokenType, List<String> roles) {
         return Map.of("role", roles,"type", tokenType);
@@ -114,7 +143,7 @@ public class UserOperation {
 
     public void passwordValidation(String payloadPassword, String dbPassword) throws Exception {
         if (!passwordEncoder.matches(payloadPassword, dbPassword)) {
-            throw new AuthenticationException("Invalid Credentials");
+            throw new Exception("Invalid Credentials");
         }
     }
 

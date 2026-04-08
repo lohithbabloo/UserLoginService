@@ -27,15 +27,15 @@ public class AuthenticationController {
 
     @Transactional
     @PostMapping("/signup")
-    public ResponseEntity<String> signup(@RequestBody UserInfoDto userInfoDto) {
+    public ResponseEntity<?> signup(@RequestBody UserInfoDto userInfoDto) {
         return new ResponseEntity<>(userOperation.createUser(userInfoDto), HttpStatus.OK);
     }
 
     @Transactional
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody UserInfoDto userInfoDto, HttpServletResponse response)
+    public ResponseEntity<?> login(@RequestBody UserInfoDto userInfoDto, HttpServletResponse response,HttpServletRequest request)
             throws Exception {
-        return userOperation.login(userInfoDto, response);
+        return userOperation.login(userInfoDto, response, request);
     }
 
     @GetMapping("/refreshToken")
