@@ -14,6 +14,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
   backend:
     image: backend:v1.0.0
     container_name: backend
@@ -36,3 +38,6 @@ services:
       - backend
     ports:
       - "3000:3000"
+
+volumes:
+  postgres_data:
