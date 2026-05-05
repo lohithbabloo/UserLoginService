@@ -1,43 +1,24 @@
 services:
-  postgres:
-    image: postgres:latest
-    container_name: postgresdb
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-    ports:
-      - "5432:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
   backend:
-    image: backend:v1.0.0
+    image: ${BACKEND_ECR_PATH}:v1.1.1
     container_name: backend
     restart: unless-stopped
-    depends_on:
-      postgres:
-        condition: service_healthy
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      SPRING_DATASOURCE_URL: ${POSTGRES_DATABASE_URL}
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
-    ports:
-      - "8080:8080"
+    expose:
+      - "8080"
   frontend:
-    image: frontend:v1.0.0
+    image: ${FRONTEND_ECR_PATH}:v1.1.1
     container_name: frontend
     restart: unless-stopped
     depends_on:
       - backend
     ports:
-      - "3000:3000"
-
-volumes:
-  postgres_data:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt:ro

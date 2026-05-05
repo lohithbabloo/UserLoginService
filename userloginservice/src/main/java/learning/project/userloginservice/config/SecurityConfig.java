@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -40,6 +41,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth    
                 .requestMatchers("/auth/**").permitAll()      
                 .requestMatchers("/actuator/**").permitAll() 
+                .requestMatchers(HttpMethod.OPTIONS).permitAll()
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -57,8 +59,7 @@ public class SecurityConfig {
         CorsConfiguration cors = new CorsConfiguration();
         
         cors.setAllowedOrigins(Arrays.asList(
-            "http://localhost:3000",
-            "http://127.0.0.1:3000"
+            "https://authify.duckdns.org"
         ));
         cors.setAllowedMethods(Arrays.asList("POST", "GET", "PUT", "DELETE", "OPTIONS"));
         cors.setAllowCredentials(true);
