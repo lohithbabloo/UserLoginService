@@ -36,15 +36,16 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                .ignoringRequestMatchers("/auth/api/v1/login","/auth/api/v1/signup")
-            )
+                .ignoringRequestMatchers("/auth/api/v1/login","/auth/api/v1/signup","/login/oauth2/**")
+            ).oauth2Login(oauth -> oauth.defaultSuccessUrl("/oauth/success",true))
             .authorizeHttpRequests(auth -> auth    
                 .requestMatchers("/auth/**").permitAll()      
                 .requestMatchers("/actuator/**").permitAll() 
+                .requestMatchers("/oauth2/**", "/login/**").permitAll()
                 .requestMatchers(HttpMethod.OPTIONS).permitAll()
                 .anyRequest().authenticated()
             )
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
             .addFilterBefore(customFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }

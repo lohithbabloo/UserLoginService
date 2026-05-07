@@ -1,6 +1,6 @@
 services:
   backend:
-    image: ${BACKEND_ECR_PATH}:v1.1.1
+    image: ${BACKEND_ECR_PATH}:v1.0.4
     container_name: backend
     restart: unless-stopped
     environment:
@@ -9,10 +9,13 @@ services:
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
+      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
+      PORT: ${PORT}
     expose:
       - "8080"
   frontend:
-    image: ${FRONTEND_ECR_PATH}:v1.1.1
+    image: ${FRONTEND_ECR_PATH}:v1.0.3
     container_name: frontend
     restart: unless-stopped
     depends_on:
