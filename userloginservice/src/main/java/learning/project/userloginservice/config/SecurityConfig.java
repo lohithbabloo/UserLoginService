@@ -2,6 +2,7 @@ package learning.project.userloginservice.config;
 
 import java.util.Arrays;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -12,24 +13,33 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.HttpMessageConverterAuthenticationSuccessHandler.AuthenticationSuccess;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import learning.project.userloginservice.service.JwtAuthCustomFilter;
+import learning.project.userloginservice.service.OauthSuccessHandler;
 
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+   
+    private OauthSuccessHandler successHandler;
+    public SecurityConfig(OauthSuccessHandler successHandler){
+        this.successHandler = successHandler;
+    }
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthCustomFilter customFilter) {
         http
@@ -37,9 +47,9 @@ public class SecurityConfig {
             .csrf(csrf -> csrf
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 .ignoringRequestMatchers("/auth/api/v1/login","/auth/api/v1/signup","/login/oauth2/**")
-            ).oauth2Login(oauth -> oauth.defaultSuccessUrl("/oauth/success",true))
+            ).oauth2Login(oauth -> oauth.successHandler(successHandler))
             .authorizeHttpRequests(auth -> auth    
-                .requestMatchers("/auth/**").permitAll()      
+                .requestMatchers("/api/**").permitAll()      
                 .requestMatchers("/actuator/**").permitAll() 
                 .requestMatchers("/oauth2/**", "/login/**").permitAll()
                 .requestMatchers(HttpMethod.OPTIONS).permitAll()
@@ -60,7 +70,7 @@ public class SecurityConfig {
         CorsConfiguration cors = new CorsConfiguration();
         
         cors.setAllowedOrigins(Arrays.asList(
-            "https://authify.duckdns.org"
+            "https://authify.duckdns.org","http://localhost:3000"
         ));
         cors.setAllowedMethods(Arrays.asList("POST", "GET", "PUT", "DELETE", "OPTIONS"));
         cors.setAllowCredentials(true);
@@ -95,4 +105,8 @@ public class SecurityConfig {
     public GrantedAuthoritiesMapper grantedAuthoritiesMapper(RoleHierarchy roleHierarchy) {
         return authorities -> roleHierarchy.getReachableGrantedAuthorities(authorities);
     }
+
+    
 }
+
+
