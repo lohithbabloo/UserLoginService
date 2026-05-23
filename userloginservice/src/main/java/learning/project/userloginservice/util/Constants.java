@@ -10,4 +10,5 @@ public class Constants {
     public static final String USER = "User";
     public static final List<String> ROLES_IN_APPLICATION = Collections.unmodifiableList(List.of(MANAGER, ADMIN, USER));
     public static final String STATUS_ACTIVE = "Active";
+    public static final String PROVIDER_GITHUB = "Github";
 }

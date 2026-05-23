@@ -13,12 +13,10 @@ import lombok.RequiredArgsConstructor;
 public class GithubService {
     private final OAuth2AuthorizedClientService oAuth2AuthorizedClientService;
 
-    public String extractAccessToke(Authentication authentication){
+    public String extractAccessToken(Authentication authentication){
         OAuth2AuthenticationToken auth = (OAuth2AuthenticationToken) authentication;
         OAuth2AuthorizedClient client = oAuth2AuthorizedClientService.loadAuthorizedClient(
             auth.getAuthorizedClientRegistrationId(), auth.getPrincipal().getName());
-            System.out.println(client);
-            System.out.println(client.getAccessToken().getTokenValue());
         return client.getAccessToken().getTokenValue();
     }
 }
