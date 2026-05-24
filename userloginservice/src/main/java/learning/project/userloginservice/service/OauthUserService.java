@@ -48,7 +48,11 @@ public class OauthUserService {
             userRepo.save(oAuthUser);
             providerRepo.save(provider);
             //now generate jwt token and add it in cookies
-            cookieUtil.generateTokenAddItToResponse(oAuthUser.getId(), response, "JWT_TOKEN", 3600);
+            cookieUtil.generateTokenAddItToResponse(oAuthUser.getId(), response, "JWT_TOKEN", 15*60);
+            cookieUtil.generateTokenAddItToResponse(oAuthUser.getId(), response, "RETRY_TOKEN", 6*60*60);
+        }else{
+            cookieUtil.generateTokenAddItToResponse(provider.getOAuthUser().getId(), response, "JWT_TOKEN", 15*60);
+            cookieUtil.generateTokenAddItToResponse(provider.getOAuthUser().getId(), response, "RETRY_TOKEN", 6*60*60);
         }
        
     }

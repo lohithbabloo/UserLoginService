@@ -5,14 +5,11 @@ import java.util.Arrays;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
-import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -91,16 +88,16 @@ public class SecurityConfig {
     }
 
 
-    @Bean
-    public RoleHierarchy roleHierarchy() {
-        String hierarchy = "ROLE_Admin > Role_Manager > ROLE_User";
-        return RoleHierarchyImpl.fromHierarchy(hierarchy);
-    }
+    // @Bean
+    // public RoleHierarchy roleHierarchy() {
+    //     String hierarchy = "ROLE_Admin > Role_Manager > ROLE_User";
+    //     return RoleHierarchyImpl.fromHierarchy(hierarchy);
+    // }
 
-    @Bean 
-    public GrantedAuthoritiesMapper grantedAuthoritiesMapper(RoleHierarchy roleHierarchy) {
-        return authorities -> roleHierarchy.getReachableGrantedAuthorities(authorities);
-    }
+    // @Bean 
+    // public GrantedAuthoritiesMapper grantedAuthoritiesMapper(RoleHierarchy roleHierarchy) {
+    //     return authorities -> roleHierarchy.getReachableGrantedAuthorities(authorities);
+    // }
 
     
 }

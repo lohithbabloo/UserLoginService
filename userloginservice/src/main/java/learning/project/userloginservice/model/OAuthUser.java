@@ -15,15 +15,16 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "OAUTH_USER")
-@Data
 @Getter
+@Setter
 public class OAuthUser {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private String Id;
+    private String id;
 
     @Column(name = "USERNAME")
     private String userName;
