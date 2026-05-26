@@ -3,10 +3,15 @@ package learning.project.userloginservice.service;
 import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.transaction.Transactional;
 import learning.project.userloginservice.dto.OAuthUserInfo;
 import learning.project.userloginservice.model.OAuthProvider;
 import learning.project.userloginservice.model.OAuthUser;
@@ -26,6 +31,9 @@ public class OauthUserService {
 
     @Autowired
     private CookieUtil cookieUtil;
+
+    @Autowired
+    private JwtService jwtService;
 
     public void saveOauthUser(OAuthUserInfo userDetails,HttpServletResponse response){
         //check if user exists in db based on the internal user id
@@ -51,8 +59,10 @@ public class OauthUserService {
             cookieUtil.generateTokenAddItToResponse(oAuthUser.getId(), response, "JWT_TOKEN", 15*60);
             cookieUtil.generateTokenAddItToResponse(oAuthUser.getId(), response, "RETRY_TOKEN", 6*60*60);
         }else{
+            provider.setAccessToken(userDetails.getAccessToken());
             cookieUtil.generateTokenAddItToResponse(provider.getOAuthUser().getId(), response, "JWT_TOKEN", 15*60);
             cookieUtil.generateTokenAddItToResponse(provider.getOAuthUser().getId(), response, "RETRY_TOKEN", 6*60*60);
+            providerRepo.save(provider);
         }
        
     }
@@ -61,4 +71,24 @@ public class OauthUserService {
         return providerRepo.findByProviderIdAndOAuthProviderAndTokenStatus(providerId, provider, Constants.STATUS_ACTIVE);
     }
  
+
+    @Transactional
+    public ResponseEntity<?> getRefreshToken(HttpServletRequest request, HttpServletResponse response) {
+        Cookie[] cookies = request.getCookies();
+        if (!ObjectUtils.isEmpty(cookies)) {
+            for (Cookie retryCookie : cookies) {
+                if (retryCookie.getName().equals("RETRY_TOKEN")) {
+                    String providerId = getOauthProviderIfExists(jwtService.extractUsername(retryCookie.getValue().toString()),"github").getOAuthUser().getId();
+                    if (!ObjectUtils.isEmpty(retryCookie.getValue().toString())) {
+                        if (!jwtService.isTokenExpired(retryCookie.getValue().toString())) ;
+                            cookieUtil.generateTokenAddItToResponse(providerId, response, "JWT_TOKEN", 15 * 60);
+                            return new ResponseEntity<>(HttpStatus.OK);
+                        }
+                    }
+                }
+            }
+        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    }
+
 }
+
