@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const baseurl = axios.create({
-  baseURL: "/api",
+  baseURL: "http://localhost:8080",
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
@@ -14,13 +14,24 @@ const baseurl = axios.create({
 
 baseurl.interceptors.response.use(
   (response) => response,
-  console.log("intercepted error:"),
-  (error) => {
-    console.log("intercepted error:", error.response);
-    if (error.response?.status === 403) {
-      window.location.href = "/forbidden";
+  async (error) => {
+    if (
+      error.response &&
+      (error.response.status === 401 || error.response.status === 403)
+    ) {
+      const originalRequest = error.config;
+      if (originalRequest._retry) {
+        window.location.href = "/";
+        return Promise.reject(error);
+      }
+      originalRequest._retry = true;
+      try {
+        await baseurl.get("/api/v1/refreshToken");
+      } catch (refreshError) {
+        return Promise.reject(refreshError);
+      }
+      return baseurl(originalRequest);
     }
-    return Promise.reject(error);
   },
 );
 
