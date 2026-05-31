@@ -11,10 +11,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import learning.project.userloginservice.service.OauthUserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 @RestController
-@RequestMapping("/auth/api/v1")
+@RequestMapping("/api/v1")
 public class AuthenticationController {
 
     @Autowired
@@ -26,5 +27,9 @@ public class AuthenticationController {
         return oauthUserService.getRefreshToken(request, response);
     }
 
+    @GetMapping("/health")
+    public ResponseEntity<String> getServiceStatus(){
+        return new ResponseEntity<>("Service Up",HttpStatus.OK);
+    }
     
 }

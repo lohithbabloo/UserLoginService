@@ -22,6 +22,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import learning.project.userloginservice.service.JwtAuthCustomFilter;
+import learning.project.userloginservice.service.OauthFailureHandler;
 import learning.project.userloginservice.service.OauthSuccessHandler;
 
 
@@ -30,8 +31,10 @@ import learning.project.userloginservice.service.OauthSuccessHandler;
 public class SecurityConfig {
    
     private OauthSuccessHandler successHandler;
-    public SecurityConfig(OauthSuccessHandler successHandler){
+    private OauthFailureHandler failureHandler;
+    public SecurityConfig(OauthSuccessHandler successHandler,OauthFailureHandler failureHandler){
         this.successHandler = successHandler;
+        this.failureHandler = failureHandler;
     }
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthCustomFilter customFilter) {
@@ -39,12 +42,12 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                .ignoringRequestMatchers("/auth/api/v1/login","/auth/api/v1/signup","/login/oauth2/**")
-            ).oauth2Login(oauth -> oauth.successHandler(successHandler))
+                .ignoringRequestMatchers("/login/oauth2/**")
+            ).oauth2Login(oauth -> oauth.successHandler(successHandler).failureHandler(failureHandler))
             .authorizeHttpRequests(auth -> auth    
-                .requestMatchers("/api/**").permitAll()      
                 .requestMatchers("/actuator/**").permitAll() 
                 .requestMatchers("/oauth2/**", "/login/**").permitAll()
+                .requestMatchers("/api/**").permitAll()
                 .requestMatchers(HttpMethod.OPTIONS).permitAll()
                 .anyRequest().authenticated()
             )
