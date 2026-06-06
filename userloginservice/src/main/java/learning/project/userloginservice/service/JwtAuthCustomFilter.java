@@ -43,8 +43,7 @@ public class JwtAuthCustomFilter extends OncePerRequestFilter{
         }
 
         if(jwtService.isTokenExpired(token)){
-            filterChain.doFilter(request, response);
-            return;
+            validateRefreshToken(request,response,filterChain);
         }
 
         String userId = jwtService.extractUsername(token);
@@ -64,6 +63,19 @@ public class JwtAuthCustomFilter extends OncePerRequestFilter{
         SecurityContextHolder.getContext().setAuthentication(auth);
         
         filterChain.doFilter(request, response);
+    }
+
+
+    private void validateRefreshToken(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
+        String refreshtoken = CookieUtil.getCookie("RETRY_TOKEN", request);
+        if(ObjectUtils.isEmpty(refreshtoken) || jwtService.isTokenExpired(refreshtoken)){
+            filterChain.doFilter(request, response);
+            return;
+        }
+        if(jwtService.isTokenExpired(refreshtoken)){
+            filterChain.doFilter(request, response);
+            return;
+        }
     }
     
 }

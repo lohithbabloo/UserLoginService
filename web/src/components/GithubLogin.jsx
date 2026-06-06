@@ -1,11 +1,11 @@
-import axios from "axios";
 import baseurl from "../commonComponents/apiClient";
 export default function GithubLogin() {
   async function handleLogin() {
     try {
-      const response = await axios.get(baseurl + "/api/v1/health");
+      const response = await baseurl.get("/auth/v1/health");
       console.log(response);
-      window.location.href = baseurl + "/oauth2/authorization/github";
+      window.location.href =
+        "http://localhost:8080/oauth2/authorization/github";
     } catch (error) {
       alert("Backend service is failing");
     }

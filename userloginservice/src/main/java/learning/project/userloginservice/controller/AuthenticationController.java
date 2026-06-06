@@ -15,7 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/auth/v1")
 public class AuthenticationController {
 
     @Autowired

@@ -17,10 +17,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
 import learning.project.userloginservice.service.JwtAuthCustomFilter;
 import learning.project.userloginservice.service.OauthFailureHandler;
 import learning.project.userloginservice.service.OauthSuccessHandler;
@@ -45,12 +45,15 @@ public class SecurityConfig {
                 .ignoringRequestMatchers("/login/oauth2/**")
             ).oauth2Login(oauth -> oauth.successHandler(successHandler).failureHandler(failureHandler))
             .authorizeHttpRequests(auth -> auth    
-                .requestMatchers("/actuator/**").permitAll() 
+                .requestMatchers("/actuator/**").permitAll()
                 .requestMatchers("/oauth2/**", "/login/**").permitAll()
-                .requestMatchers("/api/**").permitAll()
+                .requestMatchers("/auth/**").permitAll()
                 .requestMatchers(HttpMethod.OPTIONS).permitAll()
                 .anyRequest().authenticated()
-            )
+            ).exceptionHandling(ex -> ex.authenticationEntryPoint((request,response,authException)->{
+                response.sendError(401);
+                new AntPathMatcher("/api/v1/**");
+            }))
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
             .addFilterBefore(customFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
@@ -66,7 +69,7 @@ public class SecurityConfig {
         CorsConfiguration cors = new CorsConfiguration();
         
         cors.setAllowedOrigins(Arrays.asList(
-            "https://authify.duckdns.org","http://localhost:3000"
+            "https://authify.duckdns.org","http://localhost:3000","http://localhost:3001","http://localhost:8080"
         ));
         cors.setAllowedMethods(Arrays.asList("POST", "GET", "PUT", "DELETE", "OPTIONS"));
         cors.setAllowCredentials(true);

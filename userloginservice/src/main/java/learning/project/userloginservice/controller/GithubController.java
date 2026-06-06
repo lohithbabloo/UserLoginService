@@ -11,8 +11,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import learning.project.userloginservice.operation.GithubOperation;
 
 @RestController
-@RequestMapping("/api/github")
+@RequestMapping("/api/v1/github")
 public class GithubController {
+    
     @Autowired
     private GithubOperation githubOperation;
 
@@ -21,5 +22,7 @@ public class GithubController {
     public ResponseEntity<?> getUserInfo(Authentication authentication,HttpServletRequest request){
         return githubOperation.getUserInfoFromGithub(request);
     }
+
+
 
 }
