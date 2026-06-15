@@ -35,7 +35,7 @@ public class OauthSuccessHandler implements AuthenticationSuccessHandler {
         String accessToken = extractAccessToken(auth); 
         OAuthUserInfo oauthUserInfo = prepareRequiredDto(auth.getPrincipal().getAttributes(), "github",accessToken);
         oauthUserService.saveOauthUser(oauthUserInfo, response);
-        response.sendRedirect("http://localhost:3000/success");
+        response.sendRedirect("http://localhost:3001/");
     }
 
 

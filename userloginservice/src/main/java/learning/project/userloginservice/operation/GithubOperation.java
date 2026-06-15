@@ -21,9 +21,12 @@ public class GithubOperation {
 
     @Autowired
     private GithubClientApi githubClientApi;
+
+    @Autowired
+    private CookieUtil cookieUtil;
     
     public ResponseEntity<?> getUserInfoFromGithub(HttpServletRequest request){
-        String jwtToken = CookieUtil.getCookie("JWT_TOKEN", request);
+        String jwtToken = cookieUtil.getCookie("JWT_TOKEN", request);
         String userId = jwtService.extractUsername(jwtToken);
         String accessToken = oAuthProviderRepository.findAccessTokenByOAuthUserIdAndOAuthProviderAndTokenStatus(userId, "github", "Active");
         String url = "https://api.github.com/user";

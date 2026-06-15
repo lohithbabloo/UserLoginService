@@ -17,10 +17,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import learning.project.userloginservice.service.CsrfTokenGeneration;
 import learning.project.userloginservice.service.JwtAuthCustomFilter;
 import learning.project.userloginservice.service.OauthFailureHandler;
 import learning.project.userloginservice.service.OauthSuccessHandler;
@@ -38,11 +41,14 @@ public class SecurityConfig {
     }
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthCustomFilter customFilter) {
+
+        CsrfTokenRequestAttributeHandler handler = new CsrfTokenRequestAttributeHandler();
+        handler.setCsrfRequestAttributeName(null);
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf
-                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                .ignoringRequestMatchers("/login/oauth2/**")
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()).csrfTokenRequestHandler(handler)
+                // .ignoringRequestMatchers("/login/oauth2/**")
             ).oauth2Login(oauth -> oauth.successHandler(successHandler).failureHandler(failureHandler))
             .authorizeHttpRequests(auth -> auth    
                 .requestMatchers("/actuator/**").permitAll()
@@ -71,10 +77,9 @@ public class SecurityConfig {
         cors.setAllowedOrigins(Arrays.asList(
             "https://authify.duckdns.org","http://localhost:3000","http://localhost:3001","http://localhost:8080"
         ));
-        cors.setAllowedMethods(Arrays.asList("POST", "GET", "PUT", "DELETE", "OPTIONS"));
+        cors.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        cors.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type", "X-XSRF-TOKEN"));
         cors.setAllowCredentials(true);
-        cors.setAllowedHeaders(Arrays.asList("*"));
-        
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", cors);
         return source;
