@@ -20,4 +20,7 @@ public interface OAuthUserRepository extends JpaRepository<OAuthUser,String>{
     @Transactional
     @Query("update OAuthUser u set u.userName=?1 , u.devSyncUserOnboarded=?3 , u.emailAddress=?2 where u.githubUserName=?4")
     void updateUserData(String userName,String email,Boolean onBoarded,String githubUserName);
+
+    @Query("select u.githubUserName from OAuthUser u WHERE u.id = ?1 ")
+    String findGithubUserName(String id);
 }

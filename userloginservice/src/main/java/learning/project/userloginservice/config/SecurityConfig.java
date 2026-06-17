@@ -23,7 +23,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import learning.project.userloginservice.service.CsrfTokenGeneration;
 import learning.project.userloginservice.service.JwtAuthCustomFilter;
 import learning.project.userloginservice.service.OauthFailureHandler;
 import learning.project.userloginservice.service.OauthSuccessHandler;
