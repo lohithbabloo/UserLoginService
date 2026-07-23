@@ -43,7 +43,9 @@ public class JwtAuthCustomFilter extends OncePerRequestFilter{
         }
 
         if(jwtService.isTokenExpired(token)){
-            validateRefreshToken(request,response,filterChain);
+            String refreshtoken = CookieUtil.getCookie("RETRY_TOKEN", request);
+            validateRefreshToken(request,response,filterChain,refreshtoken);
+            token = refreshtoken;
         }
 
         String userId = jwtService.extractUsername(token);
@@ -66,8 +68,7 @@ public class JwtAuthCustomFilter extends OncePerRequestFilter{
     }
 
 
-    private void validateRefreshToken(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
-        String refreshtoken = CookieUtil.getCookie("RETRY_TOKEN", request);
+    private void validateRefreshToken(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain,String refreshtoken) throws IOException, ServletException {
         if(ObjectUtils.isEmpty(refreshtoken) || jwtService.isTokenExpired(refreshtoken)){
             filterChain.doFilter(request, response);
             return;

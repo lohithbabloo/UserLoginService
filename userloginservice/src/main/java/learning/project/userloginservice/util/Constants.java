@@ -11,4 +11,5 @@ public class Constants {
     public static final List<String> ROLES_IN_APPLICATION = Collections.unmodifiableList(List.of(MANAGER, ADMIN, USER));
     public static final String STATUS_ACTIVE = "Active";
     public static final String PROVIDER_GITHUB = "Github";
+    public static final String GITHUB_BASE_URL = "https://api.github.com";
 }

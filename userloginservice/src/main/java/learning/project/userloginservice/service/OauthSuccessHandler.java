@@ -1,10 +1,10 @@
 package learning.project.userloginservice.service;
 
 import java.io.IOException;
-import java.util.HashMap;
+
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;

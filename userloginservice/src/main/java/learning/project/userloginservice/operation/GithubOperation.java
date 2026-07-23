@@ -1,6 +1,7 @@
 package learning.project.userloginservice.operation;
 
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -41,11 +42,9 @@ public class GithubOperation {
         this.webClient = webClient;
     }
 
-    @Autowired
-    private CookieUtil cookieUtil;
     
     public ResponseEntity<?> getUserInfoFromGithub(HttpServletRequest request){
-        String jwtToken = cookieUtil.getCookie("JWT_TOKEN", request);
+        String jwtToken = CookieUtil.getCookie("JWT_TOKEN", request);
         String userId = jwtService.extractUsername(jwtToken);
         String accessToken = oAuthProviderRepository.findAccessTokenByOAuthUserIdAndOAuthProviderAndTokenStatus(userId, "github", "Active");
         String url = "https://api.github.com/user";
@@ -54,7 +53,7 @@ public class GithubOperation {
     }
 
     public List<GithubRepoDto> getUserRepositoryData(HttpServletRequest request){
-        String jwtToken = cookieUtil.getCookie("JWT_TOKEN", request);
+        String jwtToken = CookieUtil.getCookie("JWT_TOKEN", request);
         String userId = jwtService.extractUsername(jwtToken);
         String accessToken = oAuthProviderRepository.findAccessTokenByOAuthUserIdAndOAuthProviderAndTokenStatus(userId, "github", "Active");
         String url = "https://api.github.com/user/repos";
@@ -64,14 +63,27 @@ public class GithubOperation {
         return userRepoData;
     }
 
-    public ResponseEntity<?> getRepoCommitDetails(HttpServletRequest request,String repoName){
-        String jwtToken = cookieUtil.getCookie("JWT_TOKEN", request);
+    public List<CommitDto> getRepoCommitDetails(HttpServletRequest request,String repoName){
+        String jwtToken = CookieUtil.getCookie("JWT_TOKEN", request);
         String userId = jwtService.extractUsername(jwtToken);
         String accessToken = oAuthProviderRepository.findAccessTokenByOAuthUserIdAndOAuthProviderAndTokenStatus(userId, "github", "Active");
         String githubUserName = authUserRepository.findGithubUserName(userId);
-        String url = "https://api.github.com/repos/"+githubUserName+"/"+repoName+"/"+"commits";
-        String response = githubClientApi.get("https://api.github.com/repos/"+githubUserName+"/"+repoName+"/"+"commits", accessToken);
+        String url = "https://api.github.com/repos/"+githubUserName+"/"+repoName+"/"+"commits?per_page=5";
         List<CommitDto> commitDataOnRepo = webClient.get().uri(url).headers(headers->headers.setBearerAuth(accessToken)).retrieve().bodyToFlux(CommitDto.class).collectList().block();
-        return new ResponseEntity<>(commitDataOnRepo,HttpStatus.OK);
+        return commitDataOnRepo;
+    }
+
+    public List<CommitDto> getcommitData(HttpServletRequest request,String repoName,List<String> shaValues){
+        List<CommitDto> commitFileChanges = new ArrayList<>();
+        String jwtToken = CookieUtil.getCookie("JWT_TOKEN", request);
+        String userId = jwtService.extractUsername(jwtToken);
+        String accessToken = oAuthProviderRepository.findAccessTokenByOAuthUserIdAndOAuthProviderAndTokenStatus(userId, "github", "Active");
+        String githubUserName = authUserRepository.findGithubUserName(userId);
+        for(String shaValue : shaValues){
+            String url = "https://api.github.com/repos/"+githubUserName+"/"+repoName+"/"+"commits/"+shaValue;
+            CommitDto commitData = webClient.get().uri(url).headers(headers->headers.setBearerAuth(accessToken)).retrieve().bodyToMono(CommitDto.class).block();
+            commitFileChanges.add(commitData);
+        }
+        return commitFileChanges;
     }
 }

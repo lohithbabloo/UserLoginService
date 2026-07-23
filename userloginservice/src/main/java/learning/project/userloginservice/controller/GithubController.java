@@ -5,13 +5,16 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.servlet.http.HttpServletRequest;
+import learning.project.userloginservice.dto.CommitDto;
 import learning.project.userloginservice.dto.GithubRepoDto;
 import learning.project.userloginservice.operation.GithubOperation;
 
@@ -34,9 +37,13 @@ public class GithubController {
     }
 
     @GetMapping("/{repoName}/commits")
-    public ResponseEntity<?> getRepoCommitDto(HttpServletRequest request,@PathVariable(required = true) String repoName){
-        return githubOperation.getRepoCommitDetails(request, repoName);
+    public ResponseEntity<List<CommitDto>> getRepoCommitDto(HttpServletRequest request,@PathVariable(required = true) String repoName){
+        return new ResponseEntity<>(githubOperation.getRepoCommitDetails(request, repoName),HttpStatus.OK);
     }
 
+    @PostMapping("/{repoName}/commits")
+    public ResponseEntity<?> getFileChangesForCommit(HttpServletRequest request,@PathVariable(required = true) String repoName,@RequestBody List<String> shaValues){
+        return new ResponseEntity<>(githubOperation.getcommitData(request, repoName, shaValues),HttpStatus.OK);
+    }
 
 }

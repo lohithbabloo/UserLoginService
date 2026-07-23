@@ -26,13 +26,13 @@ public class JwtService {
     @Value("${app.jwt.expiration-minutes}")
     private long expirationMinutes;
 
-    public String generateToken(String userName, Map<String,Object> extraClaims) {
-        return generateToken(extraClaims, userName);
+    public String generateToken(String userName, Map<String,Object> extraClaims,int maxAge) {
+        return generateToken(extraClaims, userName,maxAge);
     }
 
-    public String generateToken(Map<String, Object> extraClaims, String userName) {
+    public String generateToken(Map<String, Object> extraClaims, String userName,int maxAge) {
         Instant now = Instant.now();
-        Instant expiry = now.plus(Duration.ofMinutes(expirationMinutes));
+        Instant expiry = now.plus(Duration.ofMinutes(maxAge));
 
         return Jwts.builder()
                 .setClaims(extraClaims)

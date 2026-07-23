@@ -8,4 +8,5 @@ import lombok.Setter;
 public class CommitterDto {
     private String name;
     private String email;
+    private String date;
 }

@@ -32,7 +32,7 @@ public class CookieUtil {
             String tokenType, int maxAge) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("type",tokenType);
-        String generatedToken = jwtService.generateToken(userId, claims);
+        String generatedToken = jwtService.generateToken(userId, claims,maxAge);
         Cookie cookie = new Cookie(tokenType, generatedToken);
         cookie.setHttpOnly(true);
         cookie.setSecure(false);

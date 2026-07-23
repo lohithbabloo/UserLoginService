@@ -30,7 +30,7 @@ public class UserOperation {
     public UserDto getLoggedInUserData(HttpServletRequest request) throws Exception{
         String cookie = cookieUtil.getCookie("JWT_TOKEN", request);
         if(ObjectUtils.isEmpty(cookie)){
-            throw new Exception();
+            throw new Exception("User not authenticated");
         }
         String userId = jwtService.extractUsername(cookie);
         UserDto userDto = oAuthUserRepository.findByIdAndStatus(userId, Constants.STATUS_ACTIVE);
