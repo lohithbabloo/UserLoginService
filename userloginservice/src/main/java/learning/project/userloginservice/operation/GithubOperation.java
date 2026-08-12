@@ -3,14 +3,13 @@ package learning.project.userloginservice.operation;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -73,13 +72,13 @@ public class GithubOperation {
         return commitDataOnRepo;
     }
 
-    public List<CommitDto> getcommitData(HttpServletRequest request,String repoName,List<String> shaValues){
+    public List<CommitDto> getcommitData(HttpServletRequest request,String repoName,String shaValue){
         List<CommitDto> commitFileChanges = new ArrayList<>();
         String jwtToken = CookieUtil.getCookie("JWT_TOKEN", request);
         String userId = jwtService.extractUsername(jwtToken);
         String accessToken = oAuthProviderRepository.findAccessTokenByOAuthUserIdAndOAuthProviderAndTokenStatus(userId, "github", "Active");
         String githubUserName = authUserRepository.findGithubUserName(userId);
-        for(String shaValue : shaValues){
+        if(!ObjectUtils.isEmpty(shaValue)) {
             String url = "https://api.github.com/repos/"+githubUserName+"/"+repoName+"/"+"commits/"+shaValue;
             CommitDto commitData = webClient.get().uri(url).headers(headers->headers.setBearerAuth(accessToken)).retrieve().bodyToMono(CommitDto.class).block();
             commitFileChanges.add(commitData);

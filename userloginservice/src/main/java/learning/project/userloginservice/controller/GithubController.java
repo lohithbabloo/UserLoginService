@@ -41,9 +41,9 @@ public class GithubController {
         return new ResponseEntity<>(githubOperation.getRepoCommitDetails(request, repoName),HttpStatus.OK);
     }
 
-    @PostMapping("/{repoName}/commits")
-    public ResponseEntity<?> getFileChangesForCommit(HttpServletRequest request,@PathVariable(required = true) String repoName,@RequestBody List<String> shaValues){
-        return new ResponseEntity<>(githubOperation.getcommitData(request, repoName, shaValues),HttpStatus.OK);
+    @GetMapping("/{repoName}/commits/{sha}")
+    public ResponseEntity<List<CommitDto>> getFileChangesForCommit(HttpServletRequest request,@PathVariable(required = true) String repoName,@PathVariable String sha){
+        return new ResponseEntity<>(githubOperation.getcommitData(request, repoName,sha),HttpStatus.OK);
     }
 
 }
