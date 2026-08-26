@@ -72,16 +72,18 @@ public class GithubOperation {
         return commitDataOnRepo;
     }
 
-    public List<CommitDto> getcommitData(HttpServletRequest request,String repoName,String shaValue){
+    public List<CommitDto> getcommitData(HttpServletRequest request,String repoName,List<String> shaValue){
         List<CommitDto> commitFileChanges = new ArrayList<>();
         String jwtToken = CookieUtil.getCookie("JWT_TOKEN", request);
         String userId = jwtService.extractUsername(jwtToken);
         String accessToken = oAuthProviderRepository.findAccessTokenByOAuthUserIdAndOAuthProviderAndTokenStatus(userId, "github", "Active");
         String githubUserName = authUserRepository.findGithubUserName(userId);
         if(!ObjectUtils.isEmpty(shaValue)) {
-            String url = "https://api.github.com/repos/"+githubUserName+"/"+repoName+"/"+"commits/"+shaValue;
-            CommitDto commitData = webClient.get().uri(url).headers(headers->headers.setBearerAuth(accessToken)).retrieve().bodyToMono(CommitDto.class).block();
-            commitFileChanges.add(commitData);
+            for(String sha: shaValue){
+                String url = "https://api.github.com/repos/"+githubUserName+"/"+repoName+"/"+"commits/"+sha;
+                CommitDto commitData = webClient.get().uri(url).headers(headers->headers.setBearerAuth(accessToken)).retrieve().bodyToMono(CommitDto.class).block();
+                commitFileChanges.add(commitData);
+            }
         }
         return commitFileChanges;
     }
