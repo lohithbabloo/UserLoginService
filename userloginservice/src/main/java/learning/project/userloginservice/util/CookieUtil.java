@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import learning.project.userloginservice.globalException.UnAuthorizedException;
 import learning.project.userloginservice.service.JwtService;
 
 @Component
@@ -39,6 +40,16 @@ public class CookieUtil {
         cookie.setPath("/");
         cookie.setMaxAge(maxAge);
         response.addCookie(cookie);
+    }
+
+    public String extractUserId(HttpServletRequest request){
+        String jwtToken = CookieUtil.getCookie("JWT_TOKEN", request);
+        boolean tokenValidation=jwtService.validateToken(jwtToken);
+        if(!tokenValidation){
+            throw new UnAuthorizedException("User doesnt have access to perform this operation");
+        }
+        String userId = jwtService.extractUsername(jwtToken);
+        return userId;
     }
 
 }
