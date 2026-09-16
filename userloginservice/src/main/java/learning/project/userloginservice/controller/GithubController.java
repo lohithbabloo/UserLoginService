@@ -45,5 +45,14 @@ public class GithubController {
     public ResponseEntity<List<CommitDto>> getFileChangesForCommit(HttpServletRequest request,@PathVariable(required = true) String repoName,@RequestBody List<String> sha){
         return new ResponseEntity<>(githubOperation.getcommitData(request, repoName,sha),HttpStatus.OK);
     }
+    //one api --> to get the languages widely used
+    // /repos/{owner}/{repo}/languages'
+
+    @GetMapping("/{repoName}/languages")
+    public ResponseEntity<?> getRepoLanguageDensity(HttpServletRequest request,@PathVariable String repoName){
+        return new ResponseEntity<>(githubOperation.getRepoLanguageDensity(repoName,request),HttpStatus.OK);
+    }
+
+    //one more to get the struture of the repo
 
 }

@@ -18,8 +18,6 @@ import learning.project.userloginservice.util.CookieUtil;
 @Service
 public class UserOperation {
 
-    @Autowired
-    private CookieUtil cookieUtil;
 
     @Autowired
     private JwtService jwtService;
@@ -28,7 +26,7 @@ public class UserOperation {
     private OAuthUserRepository oAuthUserRepository;
     
     public UserDto getLoggedInUserData(HttpServletRequest request) throws Exception{
-        String cookie = cookieUtil.getCookie("JWT_TOKEN", request);
+        String cookie = CookieUtil.getCookie("JWT_TOKEN", request);
         if(ObjectUtils.isEmpty(cookie)){
             throw new Exception("User not authenticated");
         }

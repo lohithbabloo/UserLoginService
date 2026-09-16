@@ -60,4 +60,11 @@ public class GithubOperation {
         }
         return commitFileChanges;
     }
+
+    public Map<String,Long> getRepoLanguageDensity(String repoName,HttpServletRequest request){
+        Map<String,String> userDetails = devSyncCommonCode.getGithubUserName(request);
+        String accessToken = userDetails.get("accessToken");
+        String githubUserName = userDetails.get("githubUserName");
+        return githubService.getRepositoryLanguageDensity(githubUserName, repoName, accessToken);
+    }
 }

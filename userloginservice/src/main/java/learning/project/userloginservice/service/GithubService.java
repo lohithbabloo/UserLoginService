@@ -1,9 +1,11 @@
 package learning.project.userloginservice.service;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
@@ -19,7 +21,7 @@ public class GithubService {
     private final OAuth2AuthorizedClientService oAuth2AuthorizedClientService;
 
 
-    @Value("sevices.authify.githuburl")
+    @Value("${services.authify.githuburl}")
     private String githubBaseUrl;
 
     @Autowired
@@ -52,15 +54,26 @@ public class GithubService {
     }
 
     public List<CommitDto> getUserCommitData(String githubUserName,String repoName,String accessToken){
-        String url = githubBaseUrl+"/repos/"+githubUserName+"/"+repoName+"/"+"commits?per_page=5";
+        String url = githubBaseUrl+"/repos/"+githubUserName+"/"+repoName+"/"+"commits?per_page=10";
         List<CommitDto> commitDataOnRepo = webClient.get().uri(url).headers(headers->headers.setBearerAuth(accessToken)).retrieve().bodyToFlux(CommitDto.class).collectList().block();
         return commitDataOnRepo;
     }
 
 
     public void getSpecificUserCommitData(String githubUserName,String repoName,String accessToken,String sha,List<CommitDto> commitFileChanges){
-        String url = githubBaseUrl+"/repos/"+githubUserName+"/"+repoName+"/"+"commits"+sha;
+        String url = githubBaseUrl+"/repos/"+githubUserName+"/"+repoName+"/"+"commits/"+sha;
         CommitDto commitDataOnRepo = webClient.get().uri(url).headers(headers->headers.setBearerAuth(accessToken)).retrieve().bodyToMono(CommitDto.class).block();
         commitFileChanges.add(commitDataOnRepo);
     } 
+
+    public Map<String,Long> getRepositoryLanguageDensity(String githubUserName,String repoName,String accessToken){
+        String url = githubBaseUrl+"/repos/"+githubUserName+"/"+repoName+"/"+"languages";
+        Map<String,Long> languageDensity = webClient.get()
+        .uri(url)
+        .headers(headers -> headers.setBearerAuth(accessToken))
+        .retrieve()
+        .bodyToMono(new ParameterizedTypeReference<Map<String, Long>>() {})
+        .block();
+        return languageDensity;
+    }
 }

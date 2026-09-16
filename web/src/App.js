@@ -3,9 +3,10 @@ import { BrowserRouter, Routes, Route } from "react-router";
 import "./index.css";
 import GithubSuccess from "./components/GithubSucces";
 import Forbidden from "./components/Forbidden";
+
 function App() {
   return (
-    <div className="">
+    <div>
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<WelcomePage />} />
