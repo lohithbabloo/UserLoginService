@@ -26,13 +26,13 @@ public class JwtService {
     @Value("${app.jwt.expiration-minutes}")
     private long expirationMinutes;
 
-    public String generateToken(String userName, Map<String,Object> extraClaims,int maxAge) {
+    public String generateToken(String userName, Map<String,Object> extraClaims,Duration maxAge) {
         return generateToken(extraClaims, userName,maxAge);
     }
 
-    public String generateToken(Map<String, Object> extraClaims, String userName,int maxAge) {
+    public String generateToken(Map<String, Object> extraClaims, String userName,Duration maxAge) {
         Instant now = Instant.now();
-        Instant expiry = now.plus(Duration.ofMinutes(maxAge));
+        Instant expiry = now.plus(maxAge);
 
         return Jwts.builder()
                 .setClaims(extraClaims)
@@ -41,6 +41,11 @@ public class JwtService {
                 .setExpiration(Date.from(expiry))
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
                 .compact();
+    }
+
+    public Claims parseTokenAndRequireType(String token,String tokenType) {
+        Claims claims = Jwts.parserBuilder().setSigningKey(getSignKey()).require("type",tokenType).build().parseClaimsJws(token).getBody();
+        return claims;
     }
 
     private Key getSignKey() {

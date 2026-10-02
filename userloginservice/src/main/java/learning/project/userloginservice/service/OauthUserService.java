@@ -1,5 +1,6 @@
 package learning.project.userloginservice.service;
 
+import java.time.Duration;
 import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -56,12 +58,12 @@ public class OauthUserService {
             userRepo.save(oAuthUser);
             providerRepo.save(provider);
             //now generate jwt token and add it in cookies
-            cookieUtil.generateTokenAddItToResponse(oAuthUser.getId(), response, "JWT_TOKEN", 15*60);
-            cookieUtil.generateTokenAddItToResponse(oAuthUser.getId(), response, "RETRY_TOKEN", 6*60*60);
+            cookieUtil.generateTokenAddItToResponse(oAuthUser.getId(), response, "JWT_TOKEN", Duration.ofMinutes(15));
+            cookieUtil.generateTokenAddItToResponse(oAuthUser.getId(), response, "RETRY_TOKEN", Duration.ofMinutes(60));
         }else{
             provider.setAccessToken(userDetails.getAccessToken());
-            cookieUtil.generateTokenAddItToResponse(provider.getOAuthUser().getId(), response, "JWT_TOKEN", 15*60);
-            cookieUtil.generateTokenAddItToResponse(provider.getOAuthUser().getId(), response, "RETRY_TOKEN", 6*60*60);
+            cookieUtil.generateTokenAddItToResponse(provider.getOAuthUser().getId(), response, "JWT_TOKEN", Duration.ofMinutes(15));
+            cookieUtil.generateTokenAddItToResponse(provider.getOAuthUser().getId(), response, "RETRY_TOKEN", Duration.ofMinutes(60));
             providerRepo.save(provider);
         }
        
@@ -74,19 +76,14 @@ public class OauthUserService {
 
     @Transactional
     public ResponseEntity<?> getRefreshToken(HttpServletRequest request, HttpServletResponse response) {
-        Cookie[] cookies = request.getCookies();
-        if (!ObjectUtils.isEmpty(cookies)) {
-            for (Cookie retryCookie : cookies) {
-                if (retryCookie.getName().equals("RETRY_TOKEN")) {
-                    String providerId = getOauthProviderIfExists(jwtService.extractUsername(retryCookie.getValue().toString()),"github").getOAuthUser().getId();
-                    if (!ObjectUtils.isEmpty(retryCookie.getValue().toString())) {
-                        if (!jwtService.isTokenExpired(retryCookie.getValue().toString())) ;
-                            cookieUtil.generateTokenAddItToResponse(providerId, response, "JWT_TOKEN", 15 * 60);
-                            return new ResponseEntity<>(HttpStatus.OK);
-                        }
-                    }
-                }
+        String retryToken = CookieUtil.getCookie("RETRY_TOKEN", request);
+        if(!ObjectUtils.isEmpty(retryToken)){
+            if(jwtService.isTokenExpired(retryToken)){
+                Claims claims = jwtService.parseTokenAndRequireType(retryToken, "RETRY_TOKEN");
+                cookieUtil.generateTokenAddItToResponse(claims.getSubject(), response, "JWT_TOKEN", Duration.ofMinutes(15));
+                cookieUtil.generateTokenAddItToResponse(claims.getSubject(), response, "RETRY_TOKEN", Duration.ofMinutes(60));
             }
+        }
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
 

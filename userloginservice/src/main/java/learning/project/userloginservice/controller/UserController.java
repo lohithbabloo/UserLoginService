@@ -25,7 +25,7 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UserDto> updateUserNameAndEmail(@RequestBody UserDto userDto){
-        return new ResponseEntity<>(userOperation.updateUserOnBoardingData(userDto),HttpStatus.OK);
+    public ResponseEntity<UserDto> updateUserNameAndEmail(@RequestBody UserDto userDto,HttpServletRequest request) throws Exception{
+        return new ResponseEntity<>(userOperation.updateUserOnBoardingData(userDto,request),HttpStatus.OK);
     }
 }

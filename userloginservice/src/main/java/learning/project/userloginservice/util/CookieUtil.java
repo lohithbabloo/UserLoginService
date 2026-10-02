@@ -1,8 +1,11 @@
 package learning.project.userloginservice.util;
 
+import org.springframework.http.HttpHeaders;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 
 import jakarta.servlet.http.Cookie;
@@ -30,16 +33,12 @@ public class CookieUtil {
     }
 
     public void generateTokenAddItToResponse(String userId, HttpServletResponse response,
-            String tokenType, int maxAge) {
+            String tokenType, Duration maxAge) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("type",tokenType);
         String generatedToken = jwtService.generateToken(userId, claims,maxAge);
-        Cookie cookie = new Cookie(tokenType, generatedToken);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(false);
-        cookie.setPath("/");
-        cookie.setMaxAge(maxAge);
-        response.addCookie(cookie);
+        ResponseCookie cookie = ResponseCookie.from(tokenType,generatedToken).httpOnly(true).sameSite("Lax").maxAge(maxAge).secure(false).path("/").build();
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());;
     }
 
     public String extractUserId(HttpServletRequest request){

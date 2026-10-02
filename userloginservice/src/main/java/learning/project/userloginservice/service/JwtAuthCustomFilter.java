@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,18 +35,14 @@ public class JwtAuthCustomFilter extends OncePerRequestFilter{
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         String token = CookieUtil.getCookie("JWT_TOKEN", request);
+
         if(ObjectUtils.isEmpty(token)){
             filterChain.doFilter(request, response);
             return;
         }
-
-        if(jwtService.isTokenExpired(token)){
-            String refreshtoken = CookieUtil.getCookie("RETRY_TOKEN", request);
-            validateRefreshToken(request,response,filterChain,refreshtoken);
-            token = refreshtoken;
-        }
-
-        String userId = jwtService.extractUsername(token);
+        
+        Claims claims = jwtService.parseTokenAndRequireType(token, "JWT_TOKEN");
+        String userId = claims.getSubject();
 
         //fetch user details from the db
         Optional<OAuthUser> oAuthUser = oAuthUserRepository.findById(userId);
@@ -65,15 +62,5 @@ public class JwtAuthCustomFilter extends OncePerRequestFilter{
     }
 
 
-    private void validateRefreshToken(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain,String refreshtoken) throws IOException, ServletException {
-        if(ObjectUtils.isEmpty(refreshtoken) || jwtService.isTokenExpired(refreshtoken)){
-            filterChain.doFilter(request, response);
-            return;
-        }
-        if(jwtService.isTokenExpired(refreshtoken)){
-            filterChain.doFilter(request, response);
-            return;
-        }
-    }
     
 }
