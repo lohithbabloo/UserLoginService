@@ -26,7 +26,4 @@ jobs:
           distribution: temurin
           java-version: 17
       - run: java --version
-
-      - run: cd /userloginservice
       - run: pwd
-      - run: mvn clean install
