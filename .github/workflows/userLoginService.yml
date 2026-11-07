@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   verify:
-    name: Verify
+    name: Run pre-scans
     runs-on: ubuntu-latest
 
     steps:
@@ -25,4 +25,10 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
-      - run: cd userloginservice && mvn clean install
+      - run: cd userloginservice && mvn clean verify
+
+      - name: Setup node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22.13.1
+      - run: cd web && npm ci && npm run build
