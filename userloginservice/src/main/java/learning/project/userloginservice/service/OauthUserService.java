@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import io.jsonwebtoken.Claims;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.transaction.Transactional;
