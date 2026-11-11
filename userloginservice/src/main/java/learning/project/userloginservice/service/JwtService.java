@@ -4,7 +4,6 @@ import java.security.Key;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -57,9 +56,6 @@ public class JwtService {
         return extractClaim(token, Claims::getSubject);
     }
 
-    public List<String> extractRole(String token) {
-        return extractClaim(token, claims -> claims.get("role", List.class));
-    }
 
     public Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);

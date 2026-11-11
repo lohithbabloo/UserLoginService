@@ -11,6 +11,7 @@ import learning.project.userloginservice.dto.UserDto;
 import learning.project.userloginservice.model.OAuthUser;
 
 public interface OAuthUserRepository extends JpaRepository<OAuthUser,String>{
+    @Query("select u from OAuthUser u where u.id=?1 and u.userStatus=?2")
     Optional<OAuthUser> findByIdAndStatus(String id,String status);
 
     @Query("select new learning.project.userloginservice.dto.UserDto(u.userName,u.githubUserName,u.emailAddress,u.devSyncUserOnboarded) from OAuthUser u where u.id=?1 and u.userStatus=?2")

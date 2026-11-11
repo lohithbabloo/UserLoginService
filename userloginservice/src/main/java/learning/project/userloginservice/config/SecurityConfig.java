@@ -1,5 +1,6 @@
 package learning.project.userloginservice.config;
 
+import java.lang.reflect.Array;
 import java.util.Arrays;
 
 import org.springframework.context.annotation.Bean;
@@ -47,7 +48,6 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()).csrfTokenRequestHandler(handler)
-                // .ignoringRequestMatchers("/login/oauth2/**")
             ).oauth2Login(oauth -> oauth.successHandler(successHandler).failureHandler(failureHandler))
             .authorizeHttpRequests(auth -> auth    
                 .requestMatchers("/actuator/**").permitAll()
@@ -77,7 +77,8 @@ public class SecurityConfig {
             "https://authify.duckdns.org","http://localhost:3000","http://localhost:3001","http://localhost:8080"
         ));
         cors.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        cors.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type", "X-XSRF-TOKEN"));
+        cors.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type", "X-XSRF-TOKEN","X-Request-ID"));
+        cors.setExposedHeaders(Arrays.asList("X-Request-ID"));
         cors.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", cors);
@@ -96,18 +97,6 @@ public class SecurityConfig {
             AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
     }
-
-
-    // @Bean
-    // public RoleHierarchy roleHierarchy() {
-    //     String hierarchy = "ROLE_Admin > Role_Manager > ROLE_User";
-    //     return RoleHierarchyImpl.fromHierarchy(hierarchy);
-    // }
-
-    // @Bean 
-    // public GrantedAuthoritiesMapper grantedAuthoritiesMapper(RoleHierarchy roleHierarchy) {
-    //     return authorities -> roleHierarchy.getReachableGrantedAuthorities(authorities);
-    // }
 
     
 }

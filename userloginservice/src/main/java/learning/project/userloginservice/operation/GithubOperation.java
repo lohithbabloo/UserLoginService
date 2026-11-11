@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.http.ResponseEntity;
@@ -26,16 +28,19 @@ public class GithubOperation {
     @Autowired
     private DevSyncCommonCode devSyncCommonCode;
 
+    private static final Logger logger = LoggerFactory.getLogger(GithubOperation.class);
+
 
     public ResponseEntity<?> getUserInfoFromGithub(HttpServletRequest request){
         String accessToken = devSyncCommonCode.getGithubUserName(request).get("accessToken");
-        
         String userInfo = githubService.getUserInfoFromGithub(accessToken);
+        logger.info("Accessing loggedin User data");
         return ResponseEntity.ok(userInfo);
     }
 
     public List<GithubRepoDto> getUserRepositoryData(HttpServletRequest request){
         String accessToken = devSyncCommonCode.getGithubUserName(request).get("accessToken");
+        logger.info("Extracting user repo data");
         List<GithubRepoDto> userRepoData = githubService.getUserRepoData(accessToken);
         return userRepoData;  
     }
@@ -44,6 +49,7 @@ public class GithubOperation {
         Map<String,String> userDetails = devSyncCommonCode.getGithubUserName(request);
         String accessToken = userDetails.get("accessToken");
         String githubUserName = userDetails.get("githubUserName");
+        logger.info("Extracting commit details");
         List<CommitDto> commitDataOnRepo = githubService.getUserCommitData(githubUserName, repoName, accessToken);
         return commitDataOnRepo;
     }
@@ -53,6 +59,7 @@ public class GithubOperation {
         Map<String,String> userDetails = devSyncCommonCode.getGithubUserName(request);
         String accessToken = userDetails.get("accessToken");
         String githubUserName = userDetails.get("githubUserName");
+        logger.info("Extracting specific commit details");
         if(!ObjectUtils.isEmpty(shaValue)) {
             for(String sha: shaValue){
                 githubService.getSpecificUserCommitData(githubUserName, repoName, accessToken, sha,commitFileChanges);
@@ -65,6 +72,7 @@ public class GithubOperation {
         Map<String,String> userDetails = devSyncCommonCode.getGithubUserName(request);
         String accessToken = userDetails.get("accessToken");
         String githubUserName = userDetails.get("githubUserName");
+        logger.info("Extracting a repo specific language density");
         return githubService.getRepositoryLanguageDensity(githubUserName, repoName, accessToken);
     }
 }
