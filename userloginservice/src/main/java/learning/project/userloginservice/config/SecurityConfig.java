@@ -1,5 +1,6 @@
 package learning.project.userloginservice.config;
 
+import java.lang.reflect.Array;
 import java.util.Arrays;
 
 import org.springframework.context.annotation.Bean;
@@ -76,7 +77,8 @@ public class SecurityConfig {
             "https://authify.duckdns.org","http://localhost:3000","http://localhost:3001","http://localhost:8080"
         ));
         cors.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        cors.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type", "X-XSRF-TOKEN"));
+        cors.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type", "X-XSRF-TOKEN","X-Request-ID"));
+        cors.setExposedHeaders(Arrays.asList("X-Request-ID"));
         cors.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", cors);

@@ -4,7 +4,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,6 +28,8 @@ public class JwtAuthCustomFilter extends OncePerRequestFilter{
     private final JwtService jwtService;
     private final OAuthUserRepository oAuthUserRepository;
 
+
+    private static final Logger logger = LoggerFactory.getLogger(JwtAuthCustomFilter.class);
     public JwtAuthCustomFilter(JwtService jwtService,OAuthUserRepository oAuthUserRepository) {
         this.jwtService = jwtService;
         this.oAuthUserRepository = oAuthUserRepository;
@@ -35,7 +38,7 @@ public class JwtAuthCustomFilter extends OncePerRequestFilter{
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         String token = CookieUtil.getCookie("JWT_TOKEN", request);
-
+        logger.info("Extracting user tokenfrom the request");
         if(ObjectUtils.isEmpty(token)){
             filterChain.doFilter(request, response);
             return;
@@ -44,7 +47,6 @@ public class JwtAuthCustomFilter extends OncePerRequestFilter{
         Claims claims = jwtService.parseTokenAndRequireType(token, "JWT_TOKEN");
         String userId = claims.getSubject();
 
-        //fetch user details from the db
         Optional<OAuthUser> oAuthUser = oAuthUserRepository.findById(userId);
         
         if(!oAuthUser.isPresent()){
